@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { MeetingSchema } from 'schema';
 import { getApi, postApi } from 'services/api';
+import Add from 'views/admin/contact/Add';
 
 const AddMeeting = (props) => {
     const { onClose, isOpen, setAction, from, fetchData, view } = props
@@ -42,14 +43,29 @@ const AddMeeting = (props) => {
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: MeetingSchema,
-        onSubmit: (values, { resetForm }) => {
+        onSubmit: async(values, { resetForm }) => {
+            await AddData(values)
+            
             
         },
     });
     const { errors, touched, values, handleBlur, handleChange, handleSubmit, setFieldValue } = formik
 
-    const AddData = async () => {
-
+    const AddData = async (values) => {
+        setIsLoding(true)
+        try {
+            let result = await postApi('api/meeting/add', values);
+            if (result) {
+                toast.success('Meeting Added Successfully')
+                setIsLoding(false)
+                setAction('Add')
+                fetchData()
+                onClose()
+            }
+        } catch (error) {
+            setIsLoding(false)
+            toast.error('Error Occured')
+        }
     };
 
     const fetchAllData = async () => {
@@ -57,7 +73,6 @@ const AddMeeting = (props) => {
     }
 
     useEffect(() => {
-
     }, [props.id, values.related])
 
     const extractLabels = (selectedItems) => {

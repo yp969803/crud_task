@@ -1,11 +1,9 @@
-const { query } = require('express');
 const MeetingHistory = require('../../model/schema/meeting')
 const mongoose = require('mongoose');
 
 const add = async (req, res) => {
    try{
         let meetingHistory = new MeetingHistory(req.body);
-        meetingHistory.createBy = req.user._id;
         await meetingHistory.save();
         res.status(201).json(meetingHistory);
     }catch (err) {
@@ -65,7 +63,8 @@ const index = async (req, res) => {
             { $project: { users: 0, contact: 0, Lead: 0 } },
         ]);
         res.send(result);
-    }catch (error) {
+    }
+    catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");
     }
